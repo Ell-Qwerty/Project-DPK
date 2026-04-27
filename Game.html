@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piket Hero | SMK Negeri 3 Jember</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+            background: #1a2a6c;
+            color: white;
+            margin: 0;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .game-header {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .back-link {
+            float: left;
+            text-decoration: none;
+            color: #ffffff;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .back-link:hover {
+            opacity: 0.7;
+        }
+
+        #game-area {
+            width: 95%;
+            max-width: 900px;
+            height: 450px;
+            background: #f0f2f5;
+            margin: 10px auto;
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 4px solid #f1c40f;
+            cursor: crosshair;
+        }
+
+        .murid {
+            position: absolute;
+            font-size: 60px;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            transition: transform 0.1s;
+            animation: bounce 0.5s infinite alternate;
+            z-index: 5;
+        }
+
+        @keyframes bounce {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-15px);
+            }
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            font-size: 20px;
+            margin: 15px;
+        }
+
+        .highscore-tag {
+            color: #f1c40f;
+            font-weight: bold;
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 20;
+            padding: 20px;
+        }
+
+        .btn-play {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+            margin-top: 20px;
+        }
+
+        .btn-play:hover {
+            transform: scale(1.1);
+            background: #2ecc71;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            background: rgba(0, 0, 0, 0.3);
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        footer b {
+            color: #f1c40f;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="game-header">
+        <a href="index.html" class="back-link">⬅ Kembali</a>
+        <h1>🎮 PIKET HERO: ATRIBUT CHECK</h1>
+        <p>Klik Murid <b>Melanggar (🤕/🏃‍♂️)</b> untuk Kuis, Hindari Murid <b>Rapi (😇)</b>!</p>
+    </div>
+
+    <div class="stats">
+        <div>Skor: <span id="skor">0</span></div>
+        <div class="highscore-tag">🏆 Rekor: <span id="highscore">0</span></div>
+        <div>Waktu: <span id="waktu">30</span>s</div>
+    </div>
+
+    <div id="game-area">
+        <div id="start-overlay" class="overlay">
+            <h2 id="msg-title">Siap Bertugas, Guru Piket?</h2>
+            <p id="msg-desc">Pastikan atribut siswa SMKN 3 Jember lengkap!</p>
+            <button class="btn-play" onclick="mulaiGame()">MULAI TUGAS</button>
+        </div>
+    </div>
+
+    <script>
+        let skor = 0;
+        let sisaWaktu = 30;
+        let gameJalan = false;
+        let spawnTimer;
+        let countdown;
+        const canvas = document.getElementById('game-area');
+
+        // Load Highscore
+        let rekor = localStorage.getItem('piketHighscore') || 0;
+        document.getElementById('highscore').innerText = rekor;
+
+        const kumpulanSoal = [
+            // KATEGORI: ATRIBUT & SERAGAM
+            { q: "Seragam Senin-Selasa yang benar adalah...", a: "Putih Abu-abu, Dasi, Topi, Ikat Pinggang", b: "Batik Sekolah & Celana Hitam", benar: "a" },
+            { q: "Warna sepatu yang diperbolehkan di sekolah umumnya...", a: "Dominan Hitam (Minimal 80%)", b: "Bebas warna-warni", benar: "a" },
+            { q: "Penggunaan almamater sekolah biasanya diwajibkan saat...", a: "Upacara atau acara resmi", b: "Jam istirahat di kantin", benar: "a" },
+
+            // KATEGORI: KEDISIPLINAN (TELAT/BOLOS)
+            { q: "Siswa yang telat datang harus lapor ke...", a: "Guru Piket untuk dicatat", b: "Penjaga kantin", benar: "a" },
+            { q: "Siswa yang ingin keluar gerbang saat jam sekolah wajib...", a: "Membawa Surat Izin Keluar dari Piket", b: "Langsung lari saat gerbang terbuka", benar: "a" },
+            { q: "Jika melihat siswa nongkrong di belakang kelas saat KBM...", a: "Ditegur dan diarahkan ke kelas", b: "Diajak ngopi bareng", benar: "a" },
+
+            // KATEGORI: TUGAS GURU PIKET
+            { q: "Salah satu tugas utama guru piket adalah...", a: "Mendata guru yang berhalangan hadir", b: "Menggantikan guru olahraga main bola", benar: "a" },
+            { q: "Jika ada kelas yang gurunya kosong (kosal), piket harus...", a: "Memberikan tugas atau menjaga kelas", b: "Menyuruh siswa pulang pagi", benar: "a" },
+            { q: "Fungsi buku piket adalah untuk mencatat...", a: "Kejadian penting selama sekolah berlangsung", b: "Daftar hutang siswa di kantin", benar: "a" },
+
+            // KATEGORI: PROSEDUR KHUSUS
+            { q: "Siswa yang merasa kurang sehat sebaiknya diarahkan ke...", a: "Ruang UKS", b: "Lab Komputer", benar: "a" },
+            { q: "Tamu yang datang ke sekolah wajib diarahkan untuk...", a: "Mengisi buku tamu di meja piket", b: "Langsung masuk ke ruang kelas", benar: "a" },
+            { q: "Saat jam istirahat berakhir, tugas piket adalah...", a: "Memastikan semua siswa masuk kelas", b: "Ikut jualan di koperasi", benar: "a" },
+
+            // KATEGORI: ETIKA & SOSIAL
+            { q: "Siswa yang kedapatan membuang sampah sembarangan...", a: "Diberi teguran edukatif/pembinaan", b: "Dibiarkan saja agar petugas kebersihan kerja", benar: "a" },
+            { q: "Membully teman termasuk pelanggaran kategori...", a: "Pelanggaran Berat (Karakter)", b: "Hanya bercanda biasa", benar: "a" },
+            { q: "Menyambut siswa di gerbang (Senyum, Sapa, Salam) bertujuan...", a: "Membangun karakter & sopan santun", b: "Cuma pamer seragam", benar: "a" }
+        ];
+
+
+        function mulaiGame() {
+            document.getElementById('start-overlay').style.display = 'none';
+            canvas.querySelectorAll('.murid').forEach(m => m.remove());
+
+            skor = 0;
+            sisaWaktu = 30;
+            gameJalan = true;
+
+            document.getElementById('skor').innerText = skor;
+            document.getElementById('waktu').innerText = sisaWaktu;
+
+            // Timer Utama
+            clearInterval(countdown);
+            countdown = setInterval(() => {
+                if (gameJalan) {
+                    sisaWaktu--;
+                    document.getElementById('waktu').innerText = sisaWaktu;
+                    if (sisaWaktu <= 0) endGame();
+                }
+            }, 1000);
+
+            munculkanMurid();
+        }
+
+        function munculkanMurid() {
+            clearTimeout(spawnTimer);
+            if (!gameJalan) return;
+
+            const types = [
+                { icon: '😇', type: 'baik' },
+                { icon: '🤕', type: 'langgar' },
+                { icon: '🏃‍♂️', type: 'langgar' }
+            ];
+            const tipe = types[Math.floor(Math.random() * types.length)];
+
+            const el = document.createElement('div');
+            el.className = 'murid';
+            el.innerText = tipe.icon;
+
+            // Random Position
+            const x = Math.random() * (canvas.offsetWidth - 80);
+            const y = Math.random() * (canvas.offsetHeight - 80);
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+
+            el.onclick = () => {
+                if (!gameJalan) return;
+                el.remove();
+
+                if (tipe.type === 'langgar') {
+                    gameJalan = false; // Pause timer
+                    const soal = kumpulanSoal[Math.floor(Math.random() * kumpulanSoal.length)];
+
+                    // Delay dikit biar gak kaget
+                    setTimeout(() => {
+                        let jawab = confirm("🚨 PELANGGARAN TERDETEKSI!\n\n" + soal.q + "\n\nOKE: " + soal.a + "\nCANCEL: " + soal.b);
+                        let isBenar = (jawab && soal.benar === 'a') || (!jawab && soal.benar === 'b');
+
+                        if (isBenar) {
+                            skor += 20;
+                            alert("✅ BENAR! Poin +20");
+                        } else {
+                            skor -= 10;
+                            alert("❌ SALAH! Poin -10");
+                        }
+
+                        document.getElementById('skor').innerText = skor;
+                        gameJalan = true;
+                        munculkanMurid();
+                    }, 50);
+                } else {
+                    skor -= 15;
+                    document.getElementById('skor').innerText = skor;
+                    alert("🚫 SALAH TANGKAP! Itu murid teladan. Poin -15");
+                    munculkanMurid();
+                }
+            };
+
+            canvas.appendChild(el);
+
+            // Hilang otomatis dalam 1.5 detik
+            setTimeout(() => { if (el.parentNode) el.remove(); }, 1500);
+
+            // Munculin murid berikutnya
+            spawnTimer = setTimeout(munculkanMurid, 1000);
+        }
+
+        function endGame() {
+            gameJalan = false;
+            clearInterval(countdown);
+            clearTimeout(spawnTimer);
+
+            const overlay = document.getElementById('start-overlay');
+            const title = document.getElementById('msg-title');
+            const desc = document.getElementById('msg-desc');
+
+            if (skor > rekor) {
+                rekor = skor;
+                localStorage.setItem('piketHighscore', rekor);
+                document.getElementById('highscore').innerText = rekor;
+                title.innerText = "🎉 REKOR BARU!";
+            } else {
+                title.innerText = "WAKTU HABIS!";
+            }
+
+            desc.innerHTML = `Skor Akhir: <b>${skor}</b><br>Rekor Tertinggi: ${rekor}`;
+            overlay.style.display = 'flex';
+        }
+    </script>
+
+    <footer>
+        &copy; 2026 <b>Kelompok [APEJE]</b> - SMK Negeri 3 Jember.
+        <br>Project Tugas Guru Piket v1.0
+    </footer>
+</body>
+
+</html>

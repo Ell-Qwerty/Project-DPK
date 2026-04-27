@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jadwal Guru Piket Mingguan</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f4f8;
+            padding: 30px;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            flex: 1;
+
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .text-center {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .tabs-hari {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 25px;
+            border: none;
+            background: white;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-btn:hover,
+        .tab-btn.active {
+            background: #3498db;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
+        }
+
+
+        .grid-guru {
+            display: flex;
+
+            overflow-x: auto;
+
+            gap: 20px;
+            padding: 20px 10px 40px 10px;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+
+
+
+            scroll-snap-type: x mandatory;
+        }
+
+
+        .grid-guru::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .grid-guru::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .card-guru {
+            background: white;
+            min-width: 250px;
+
+            padding: 25px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.4s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            animation: fadeIn 0.5s ease;
+
+
+            scroll-snap-align: center;
+        }
+
+        .card-guru:hover {
+            transform: translateY(-10px);
+            border: 2px solid #3498db;
+        }
+
+
+        .icon-circle {
+            width: 100px;
+            height: 100px;
+            background: #ebf5ff;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #f0f4f8;
+        }
+
+        .icon-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+
+            object-position: center 20%;
+        }
+
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            position: relative;
+            animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 15px;
+            cursor: pointer;
+            font-size: 30px;
+            color: #aaa;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #2c3e50;
+            color: white;
+            margin-top: auto;
+        }
+
+        footer b {
+            color: #f1c40f;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <a href="index.html" class="back-link">⬅ Kembali ke Beranda</a>
+
+        <h1>📅 Jadwal Piket Guru</h1>
+        <p class="text-center">Pilih hari untuk melihat daftar guru yang bertugas:</p>
+
+        <div class="tabs-hari" id="tabContainer">
+
+            <button class="tab-btn active" onclick="filterHari('Senin', this)">Senin</button>
+            <button class="tab-btn" onclick="filterHari('Selasa', this)">Selasa</button>
+            <button class="tab-btn" onclick="filterHari('Rabu', this)">Rabu</button>
+            <button class="tab-btn" onclick="filterHari('Kamis', this)">Kamis</button>
+            <button class="tab-btn" onclick="filterHari('Jumat', this)">Jumat</button>
+        </div>
+
+        <div id="displayGuru" class="grid-guru"></div>
+    </div>
+
+
+    <div id="modalGuru" class="modal" onclick="tutupModalLuar(event)">
+        <div class="modal-content">
+            <span class="close-btn" onclick="tutupModal()">&times;</span>
+            <div id="g-icon-container"></div>
+            <h2 id="g-nama" style="margin-top: 15px;"></h2>
+            <p id="g-status" style="color: #3498db; font-weight: bold;">Guru Piket Terjadwal</p>
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+            <p style="font-size: 14px; color: #7f8c8d;">SMK Negeri 3 Jember</p>
+        </div>
+    </div>
+
+    <script>
+        const dataJadwal = {
+            'Senin': [
+                { nama: 'Bpk Apri Purwidiyanto, S', icon: 'apri.jpeg' },
+                { nama: 'Candra Tony H,S.Kom', icon: 'Chandra.jpeg' },
+                { nama: 'Hafila,Rozama,S.Pd', icon: 'Roza.jpeg' }
+            ],
+            'Selasa': [
+                { nama: 'Dra.Rita Prihartini', icon: 'rita.jpeg' },
+                { nama: 'Rohman Haqiqi S.Pd.', icon: 'Haqiqi.jpeg' },
+                { nama: 'Cicik Tri P,S.Pd.', icon: 'cicik.jpeg' }
+            ],
+            'Rabu': [
+                { nama: 'Elvi Daimumah,S.Si.', icon: 'Elvi.jpeg' },
+                { nama: 'Mujahidah,S.Pd.', icon: 'mujahidah.jpg' },
+                { nama: 'Wiwik A S.pd.', icon: 'wiwik.jpeg' }
+            ],
+            'Kamis': [
+                { nama: 'Eny Retno W.S.Pd.', icon: 'eny.jpg' },
+                { nama: 'Siti Sumkoiyum,S,pd.', icon: 'sumiyokum.jpeg' },
+                { nama: 'Reny Andiyani J.A.,S.Si.', icon: 'Reni.jpeg' }
+            ],
+            'Jumat': [
+                { nama: 'Suyanto,SE.', icon: 'suyanto.jpeg' },
+                { nama: 'A. Muiz,S,Pdl.', icon: 'Muiz.jpeg' },
+                { nama: 'Imron Atul Hasanah,S.Pd.', icon: 'imron.jpg' }
+            ],
+        };
+
+        const pathFolder = "FOTO/";
+
+        function filterHari(hari, element) {
+
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            const display = document.getElementById('displayGuru');
+            display.innerHTML = '';
+
+            if (dataJadwal[hari]) {
+                dataJadwal[hari].forEach(guru => {
+
+                    const card = `
+                        <div class="card-guru" onclick="tampilDetail('${guru.nama}', '${guru.icon}')">
+                            <div class="icon-circle">
+                                <img src="${pathFolder}${guru.icon}" alt="Foto ${guru.nama}" onerror="this.src='https://placeholder.com'">
+                            </div>
+                            <h3>${guru.nama}</h3>
+                        </div>
+                    `;
+                    display.innerHTML += card;
+                });
+            }
+        }
+
+        function tampilDetail(nama, icon) {
+            document.getElementById('g-nama').innerText = nama;
+            document.getElementById('g-icon-container').innerHTML = `
+                <img src="${pathFolder}${icon}" style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 5px solid #3498db; box-shadow: 0 5px 15px rgba(0,0,0,0.1);" onerror="this.src='https://placeholder.com'">
+            `;
+            document.getElementById('modalGuru').style.display = 'block';
+        }
+
+        function tutupModal() {
+            document.getElementById('modalGuru').style.display = 'none';
+        }
+
+        // Fungsi tutup modal saat klik di luar area konten
+        function tutupModalLuar(event) {
+            if (event.target.id === 'modalGuru') {
+                tutupModal();
+            }
+        }
+
+        window.onload = () => {
+            filterHari('Senin', document.querySelector('.tab-btn'));
+        };
+    </script>
+
+    <footer>
+        &copy; 2026 <b>Kelompok [APEJE]</b> - SMK Negeri 3 Jember.
+    </footer>
+</body>
+
+</html>

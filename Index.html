@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Guru Piket | SMKN 3 Jember</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --secondary: #2ecc71;
+            --accent: #f1c40f;
+            --dark: #2c3e50;
+            --light: #f4f7f6;
+            --white: #ffffff;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* SLIDER */
+        .slider-wrapper {
+            width: 100%;
+            max-width: 800px;
+            margin: 20px auto;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            position: relative;
+        }
+
+        .slides {
+            display: flex;
+            width: 100%;
+        }
+
+        .slides img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .logo-sekolah {
+            width: 100px;
+            margin-bottom: 15px;
+            transition: transform 0.3s;
+            border-radius: 50%;
+        }
+
+        .logo-sekolah:hover {
+            transform: scale(1.1);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .line {
+            width: 60px;
+            height: 5px;
+            background: #e67e22;
+            margin: 10px auto;
+            border-radius: 10px;
+        }
+
+        .subtitle {
+            color: #ffffff;
+            margin-bottom: 40px;
+        }
+
+        /* MENU CARDS */
+        .menu-wrapper {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 40px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            color: var(--dark);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow);
+        }
+
+        .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .title {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* ABOUT TEXT LINK */
+        .about-link {
+            margin-top: 30px;
+            display: inline-block;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.3s;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.4);
+        }
+
+        .about-link:hover {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--white);
+            margin: 10% auto;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 25px;
+            text-align: center;
+            animation: slideDown 0.4s ease;
+            color: black;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .foto-pembimbing {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 20px 0;
+            border: 4px solid var(--primary);
+        }
+
+        .btn-popup {
+            display: block;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 15px;
+            transition: 0.3s;
+            text-align: center;
+        }
+
+        .btn-blue {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-green {
+            background: #2ecc71;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #ecf0f1;
+            color: #7f8c8d;
+            margin-top: 15px;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.2);
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        footer b {
+            color: #f1c40f;
+        }
+    </style>
+</head>
+
+<body onload="tampilWelcome()">
+
+    <div class="container">
+        <div class="slider-wrapper">
+            <div class="slides" id="mainSlides">
+                <img src="apj.jpeg" alt="Slide 1">
+                <img src="apj2.jpeg" alt="Slide 2">
+                <img src="apj3.jpeg" alt="Slide 3">
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <img src="logo.jpg" alt="Logo" class="logo-sekolah">
+        <h1>Portal Guru Piket</h1>
+        <h1 style="font-weight: bold; color: var(--primary);">SMK Negeri 3 Jember</h1>
+        <div class="line"></div>
+        <p class="subtitle">Pilih modul navigasi di bawah ini:</p>
+
+        <div class="menu-wrapper">
+            <button onclick="bukaModal('modal1')" class="card" style="border-bottom: 8px solid var(--primary);">
+                <div class="icon">🏫</div>
+                <div class="title">Praktik Belajar Mengajar (PBM)</div>
+            </button>
+            <button onclick="bukaModal('modal2')" class="card" style="border-bottom: 8px solid var(--secondary);">
+                <div class="icon">👋</div>
+                <div class="title">Piket Budaya Positif</div>
+            </button>
+            <a href="Game.html" class="card" style="border-bottom: 8px solid var(--accent);">
+                <div class="icon">🎮</div>
+                <div class="title">Game Edukasi Piket</div>
+            </a>
+        </div>
+
+        <!-- INI TULISAN ABOUT-NYA JIR -->
+        <span class="about-link" onclick="bukaModal('modalAbout')">Tugas Guru Piket?</span>
+    </div>
+
+    <!-- MODAL WELCOME -->
+    <div id="modalWelcome" class="modal">
+        <div class="modal-content">
+            <h2>Selamat Datang!</h2>
+            <p style="color: #7f8c8d;">Sistem Informasi Piket Kelompok [APEJE]</p>
+            <img src="foto bu mi2n.jpeg" alt="Guru Pembimbing" class="foto-pembimbing">
+            <p>Guru Pembimbing:</p>
+            <h3 style="color: var(--primary);">Ibu Mimin</h3>
+            <button onclick="tutupModal('modalWelcome')" class="btn-popup btn-blue" style="margin-top: 20px;">MASUK KE
+                SISTEM</button>
+        </div>
+    </div>
+
+    <!-- MODAL PBM -->
+    <div id="modal1" class="modal">
+        <div class="modal-content">
+            <h3>🏫 Praktik Belajar Mengajar (PBM)</h3>
+            <p>Pilih layanan yang tersedia:</p>
+            <a href="list.guru.html" class="btn-popup btn-blue">Lihat Jadwal Guru</a>
+            <a href="form_keterlambatan.html" class="btn-popup btn-green">Isi Form Keterlambatan</a>
+            <button onclick="tutupModal('modal1')" class="btn-popup btn-cancel">Batal</button>
+        </div>
+    </div>
+
+    <!-- MODAL PIKET -->
+    <div id="modal2" class="modal">
+        <div class="modal-content">
+            <h3>👋 Piket Budaya Positif</h3>
+            <p>Pilih gerbang penugasan:</p>
+            <a href="piket_penyambutan.html" class="btn-popup btn-blue">Lanjut ke Sistem Gerbang</a>
+            <button onclick="tutupModal('modal2')" class="btn-popup btn-cancel">Batal</button>
+        </div>
+    </div>
+
+    <!-- MODAL ABOUT (TUGAS GURU PIKET) -->
+    <div id="modalAbout" class="modal">
+        <div class="modal-content" style="text-align: left;">
+            <h3 style="text-align: center; color: var(--primary);">📋 Tugas Guru Piket</h3>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #eee;">
+            <ul style="padding-left: 20px; color: #2c3e50; font-size: 0.9rem; line-height: 1.6;">
+                <li>Meningkatkan pelaksanaan 9K (Keamanan, Kebersihan, Ketertiban, Keindahan, Kekeluargaan, Kerindangan,
+                    Kesehatan, Keteladanan, Keterbukaan).</li>
+                <li>Mengawasi pergantian jam pelajaran & istirahat.</li>
+                <li>Menerima dan mendata tamu sekolah.</li>
+                <li>Mencatat siswa yang terlambat atau izin keluar.</li>
+                <li>Mengatur guru pengganti jika ada yang berhalangan hadir.</li>
+            </ul>
+            <button onclick="tutupModal('modalAbout')" class="btn-popup btn-cancel">Tutup</button>
+        </div>
+    </div>
+
+    <script>
+        function bukaModal(id) { document.getElementById(id).style.display = 'block'; }
+        function tutupModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function tampilWelcome() {
+            let sudahMasuk = sessionStorage.getItem('pernahMasuk');
+            if (!sudahMasuk) {
+                document.getElementById('modalWelcome').style.display = 'block';
+                sessionStorage.setItem('pernahMasuk', 'true');
+            }
+        }
+
+        const slides = document.getElementById('mainSlides');
+        function autoSlide() {
+            slides.style.transition = "transform 0.8s cubic-bezier(0.45, 0, 0.55, 1)";
+            slides.style.transform = "translateX(-100%)";
+            setTimeout(() => {
+                slides.style.transition = "none";
+                slides.appendChild(slides.firstElementChild);
+                slides.style.transform = "translateX(0)";
+            }, 800);
+        }
+        setInterval(autoSlide, 4000);
+
+        window.onclick = function (event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+
+    <footer>
+        <p>&copy; 2026 <b>Kelompok [APEJE]</b> - SMK Negeri 3 Jember</p>
+        <p>Project Tugas Produk Guru Piket</p>
+    </footer>
+</body>
+
+</html>

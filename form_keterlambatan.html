@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Form Keterlambatan | SMKN 3 Jember</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #2c3e50;
+           
+            color: white;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .back-link {
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .form-box {
+            background: white;
+            color: #333;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            margin: 40px auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        h3 {
+            text-align: center;
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background: #e67e22;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: #d35400;
+            transform: translateY(-2px);
+        }
+
+        #kartuIzin {
+            display: none;
+            background: #f9f9f9;
+            color: #333;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 25px;
+            border-left: 8px solid #27ae60;
+          
+            border-right: 1px solid #ddd;
+            border-top: 1px solid #ddd;
+            border-bottom: 1px solid #ddd;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .punishment {
+            display: block;
+            margin-top: 5px;
+            color: #c0392b;
+            font-weight: bold;
+            background: #fce4e4;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px dashed #c0392b;
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            background: rgba(0, 0, 0, 0.4);
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        footer b {
+            color: #f1c40f;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">⬅ Kembali ke Dashboard</a>
+
+        <div class="form-box">
+            <h3>📝 Form Keterlambatan</h3>
+            <input type="text" id="nama" placeholder="Nama Lengkap Siswa">
+            <input type="text" id="kelas" placeholder="Kelas (Contoh: X-RPL 1)">
+            <input type="text" id="mapel" placeholder="Mata Pelajaran Saat Ini">
+            <button onclick="prosesIzin()">DAPATKAN SURAT IZIN</button>
+
+            <!-- Tampilan Surat Izin -->
+            <div id="kartuIzin">
+                <h4 style="margin:0; color: #27ae60;">✅ SURAT IZIN MASUK</h4>
+                <hr style="border: 0; border-top: 1px solid #ddd; margin: 10px 0;">
+                <p style="margin: 5px 0;">Diberikan kepada: <br><b id="resNama" style="font-size: 18px;"></b></p>
+                <p style="margin: 5px 0;">Kelas: <span id="resKelas"></span></p>
+                <p style="margin: 5px 0;">Mapel: <span id="resMapel"></span></p>
+                <p style="margin: 15px 0 5px 0;">Hukuman (Punishment):</p>
+                <span class="punishment" id="resPunish"></span>
+                <p style="font-size: 11px; color: #7f8c8d; margin-top: 15px; font-style: italic;">
+                    *Tunjukkan surat digital ini kepada guru pengajar di kelas.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function prosesIzin() {
+            // Ambil Input
+            const nama = document.getElementById('nama').value;
+            const kelas = document.getElementById('kelas').value;
+            const mapel = document.getElementById('mapel').value;
+
+            // Validasi Sederhana: Biar gak kosong
+            if (nama == "" || kelas == "" || mapel == "") {
+                alert("Mohon untuk mengisi data.");
+                return;
+            }
+
+            const listPunish = [
+                "Membaca Surat Pendek (Juz Amma)",
+                "Memungut 10 Sampah di Area Sekitar",
+                "Merapikan Sepatu di Depan Kelas",
+                "Menyanyikan Lagu Indonesia Raya",
+                "Membersihkan Kaca Jendela Kelas",
+                "Menyiram Tanaman di Taman Depan",
+                "Hormat Bendera Selama 10 Menit",
+                "Menulis Janji Tidak Telat 20x"
+            ];
+
+            const randomPunish = listPunish[Math.floor(Math.random() * listPunish.length)];
+
+            // Isi Data ke Kartu
+            document.getElementById('resNama').innerText = nama;
+            document.getElementById('resKelas').innerText = kelas;
+            document.getElementById('resMapel').innerText = mapel;
+            document.getElementById('resPunish').innerText = randomPunish;
+
+            // Munculkan Kartu
+            document.getElementById('kartuIzin').style.display = 'block';
+        }
+    </script>
+
+    <footer>
+        &copy; 2026 <b>Kelompok [APEJE]</b> - SMK Negeri 3 Jember.
+        <br>Project Tugas Guru Piket v1.0
+    </footer>
+</body>
+
+</html>

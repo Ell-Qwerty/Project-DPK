@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Piket Penyambutan | SMKN 3 Jember</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #fdfdfd;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+            flex: 1;
+        }
+
+        .back-link {
+            float: left;
+            text-decoration: none;
+            color: #27ae60;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .back-link:hover {
+            transform: translateX(-5px);
+        }
+
+        /* Pilihan Gerbang */
+        .gerbang-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .btn-gerbang {
+            padding: 15px 25px;
+            border: 2px solid #27ae60;
+            background: white;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-gerbang.active {
+            background: #27ae60;
+            color: white;
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        /* Hari Tabs */
+        .tabs-hari {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 18px;
+            border: none;
+            background: #eee;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            background: #27ae60;
+            color: white;
+        }
+
+        /* GRID GURU MENYAMPING (HORIZONTAL) */
+        .grid-guru {
+            display: flex;
+            /* Kunci menyamping */
+            overflow-x: auto;
+            /* Biar bisa di-scroll */
+            gap: 20px;
+            padding: 20px 10px 40px 10px;
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+            /* Efek lock di tengah */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Styling Scrollbar */
+        .grid-guru::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .grid-guru::-webkit-scrollbar-thumb {
+            background: #27ae60;
+            border-radius: 10px;
+        }
+
+        .card-guru {
+            background: white;
+            min-width: 260px;
+            /* Lebar kartu agar tidak gepeng */
+            padding: 30px 20px;
+            border-radius: 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.4s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            scroll-snap-align: center;
+            /* Kartu berhenti di tengah */
+            border: 1px solid #f0f0f0;
+        }
+
+        .card-guru:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+            border-color: #27ae60;
+        }
+
+        .icon-circle {
+            width: 100px;
+            height: 100px;
+            background: #f0fdf4;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #27ae60;
+        }
+
+        .icon-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* Geser posisi foto 20% dari atas, biar mukanya kelihatan */
+            object-position: center 20%;
+        }
+
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 380px;
+            margin: 100px auto;
+            padding: 35px;
+            border-radius: 25px;
+            text-align: center;
+            position: relative;
+            animation: popIn 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            cursor: pointer;
+            font-size: 28px;
+            color: #999;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        footer b {
+            color: #f1c40f;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <a href="index.html" class="back-link">⬅ Kembali</a>
+        <br><br>
+        <h1>👋 Piket Penyambutan</h1>
+        <p>Silahkan pilih lokasi tugas untuk melihat jadwal guru:</p>
+
+        <div class="gerbang-selector">
+            <button id="btnDepan" class="btn-gerbang active" onclick="setGerbang('Depan')">🚪 Gerbang Depan</button>
+            <button id="btnBelakang" class="btn-gerbang" onclick="setGerbang('Belakang')">🚲 Gerbang Belakang</button>
+            <button id="btnParkir" class="btn-gerbang" onclick="setGerbang('Parkir')">🚗 Pintu Parkir Ruang 4</button>
+        </div>
+
+        <div class="tabs-hari">
+            <button class="tab-btn active" onclick="setHari('Senin', this)">Senin</button>
+            <button class="tab-btn" onclick="setHari('Selasa', this)">Selasa</button>
+            <button class="tab-btn" onclick="setHari('Rabu', this)">Rabu</button>
+            <button class="tab-btn" onclick="setHari('Kamis', this)">Kamis</button>
+            <button class="tab-btn" onclick="setHari('Jumat', this)">Jumat</button>
+        </div>
+
+        <!-- LIST GURU MENYAMPING -->
+        <div id="listGuru" class="grid-guru"></div>
+    </div>
+
+    <!-- Modal Detail -->
+    <div id="modalGuru" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="tutupModal()">&times;</span>
+            <div id="m-icon-container"></div>
+            <h2 id="m-nama" style="margin: 15px 0 5px 0;"></h2>
+            <p id="m-lokasi" style="color: #27ae60; font-weight: bold; margin-bottom: 15px;"></p>
+            <hr style="border: 0; border-top: 1px solid #eee;">
+            <p style="color: #666; font-size: 14px; margin-top: 15px;">Tugas Utama: Menyambut Siswa & Cek Atribut
+                Sekolah</p>
+        </div>
+    </div>
+
+    <script>
+        let gerbangAktif = 'Depan';
+        let hariAktif = 'Senin';
+
+        // Data lo yang tadi (Gua persingkat buat contoh, lo bisa isi lengkap lagi)
+        const databaseGuru = {
+            'Depan': {
+                'Senin': [
+                    { nama: 'Sevi S', icon: 'sevi.jpeg' },
+                    { nama: 'Frans W.', icon: 'Frans.jpeg' },
+                    { nama: 'Wiwik A', icon: 'wiwik.jpeg' },
+                    { nama: 'Dony T', icon: 'dony.jpg' },
+
+                ],
+                'Selasa': [
+                    { nama: 'Sri wahyuni', icon: 'sri.jpeg' },
+                    { nama: 'yeni s', icon: 'yeni.jpeg' },
+                    { nama: 'Kusriwayani', icon: 'kusriwyani.jpg' },
+                    { nama: 'Novaning P', icon: 'nova.jpg' },
+                    { nama: 'Faisol amir', icon: 'amir.jpg' },
+
+
+                ],
+                'Rabu': [
+                    { nama: 'Ardha Dwi E.', icon: 'ardha.jpeg' },
+                    { nama: 'Nada Q', icon: 'nada.jpeg' },
+                    { nama: 'Rudi Utomo', icon: 'rudi.jpeg' },
+                    { nama: 'Tintin Ratnawati', icon: 'tintin.jpg' },
+                ],
+                'Kamis': [
+                    { nama: 'Anang a', icon: 'anang.jpeg' },
+                    { nama: 'Diana Binti', icon: 'diana.jpg' },
+                    { nama: 'Tri Handayani', icon: 'tri.jpeg' },
+                    { nama: 'Alfiyah', icon: 'alfiyah.jpeg' },
+                ],
+                'Jumat': [
+                    { nama: 'Nunuk S', icon: 'nunuk.jpeg' },
+                    { nama: 'Siti Armani', icon: 'siti armani.jpg' },
+                    { nama: 'Endah P', icon: 'endah.jpeg' },
+                    { nama: 'Hadi Damaskus', icon: 'hadi.jpeg' },
+                ]
+            },
+            'Belakang': {
+                'Senin': [
+                    { nama: 'Sri SuryaningTyas', icon: 'surya.jpg' },
+                    { nama: 'Lusi D', icon: 'lusi.jpeg' },
+                    { nama: 'Irwan G', icon: 'irwan.jpeg' },
+                    { nama: 'Yolanda', icon: 'yolanda.jpeg' },
+                    { nama: 'Nur Kholis', icon: 'nur kholis.jpeg' },
+
+                ],
+                'Selasa': [
+                    { nama: 'Mimin R', icon: 'foto bu mi2n.jpeg' },
+                    { nama: 'Siti Masruroh', icon: 'ruroh.jpeg' },
+                    { nama: 'Inayah R', icon: 'inayah.jpeg' },
+                    { nama: 'Dyah Wijayanti', icon: 'dyah.jpg' },
+                    { nama: 'Sri Mulyani', icon: 'sri.jpeg' },
+
+                ],
+                'Rabu': [
+                    { nama: 'Mujahidah', icon: 'mujahidah.jpeg' },
+                    { nama: 'faridah Ariyani', icon: 'faridah.jpeg' },
+                    { nama: 'Ahmad Fahrudin', icon: 'fahrudin.jpeg' },
+                    { nama: 'Agus ishariyanto', icon: 'agus.jpeg' },
+                    { nama: 'Luluk Inayah', icon: 'luluk.jpeg' },
+
+                ],
+                'Kamis': [
+                    { nama: 'Kristin A', icon: 'kristin.jpeg' },
+                    { nama: 'Riyani', icon: 'riyani.jpeg' },
+                    { nama: 'Rima F', icon: 'rima.jpeg' },
+                    { nama: 'A. Anwar', icon: 'anwar.jpeg' },
+                    { nama: 'Doni Kurniawan', icon: 'doni.jpg' },
+
+                ],
+                'Jumat': [
+                    { nama: 'Andi CH', icon: 'andi.jpg' },
+                    { nama: 'Hendrit Ratna E', icon: 'hendrit.jpg' },
+                    { nama: 'Ayup F', icon: 'ayup.jpeg' },
+                    { nama: 'Kurnia M', icon: 'kurnia.jpeg' },
+                    { nama: 'Murnita', icon: 'nita.jpeg' },
+
+                ]
+            },
+            'Parkir': {
+                'Senin': [
+                    { nama: 'Yuli A', icon: 'yuli.jpg' },
+                    { nama: 'Harni S', icon: 'harno.jpeg' },
+                    { nama: 'Syaroni', icon: 'roni.jpg' },
+                    { nama: 'M.Ainun', icon: 'ainun.jpeg' },
+                ],
+                'Selasa': [
+                    { nama: 'Endah Esthi', icon: '' },
+                    { nama: 'Ulva Fatati', icon: '' },
+                    { nama: 'Frida Yunita', icon: '' },
+                    { nama: 'Titin Irawati', icon: 'titin.jpeg' },
+
+                ],
+                'Rabu': [
+                    { nama: 'Lilik Tri Heksa', icon: 'heksa.jpg' },
+                    { nama: 'Divya P', icon: '' },
+                    { nama: 'Haris M', icon: '' },
+                    { nama: 'Lia Eka W', icon: 'lia.jpg' },
+
+                ],
+                'Kamis': [
+                    { nama: 'Yunus B', icon: 'yunus.jpg' },
+                    { nama: 'Vika Oktaviani', icon: 'vika.jpg' },
+                    { nama: 'Nur Wahidah', icon: '' },
+                    { nama: 'Desi R', icon: '' },
+
+                ],
+                'Jumat': [
+                    { nama: 'Fatimatur R', icon: '' },
+                    { nama: 'Nurus Shidqi', icon: '' },
+                    { nama: 'Rohatin', icon: 'rohatin.jpeg' },
+                    { nama: 'Rizky Suhartono', icon: '' },
+                ],
+            }
+        };
+        const pathFolder = "FOTO/";
+
+        function setGerbang(lokasi) {
+            gerbangAktif = lokasi;
+            document.querySelectorAll('.btn-gerbang').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn' + lokasi).classList.add('active');
+            updateTampilan();
+        }
+
+        function setHari(hari, el) {
+            hariAktif = hari;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            updateTampilan();
+        }
+
+        function updateTampilan() {
+            const list = document.getElementById('listGuru');
+            list.innerHTML = '';
+            list.scrollLeft = 0; // Balikin scroll ke awal
+
+            const guruHariIni = (databaseGuru[gerbangAktif] && databaseGuru[gerbangAktif][hariAktif]) || [];
+
+            if (guruHariIni.length > 0) {
+                guruHariIni.forEach(guru => {
+                    list.innerHTML += `
+                    <div class="card-guru" onclick="bukaModal('${guru.nama}', '${guru.icon}')">
+                        <div class="icon-circle">
+                            <img src="${pathFolder}${guru.icon}" onerror="this.src='https://placeholder.com'" alt="Foto ${guru.nama}">
+                        </div>
+                        <h3>${guru.nama}</h3>
+                    </div>
+                `;
+                });
+            } else {
+                list.innerHTML = '<p style="padding: 40px; width: 100%; text-align: center;">Belum ada jadwal piket.</p>';
+            }
+        }
+
+        function bukaModal(nama, icon) {
+            document.getElementById('m-nama').innerText = nama;
+            document.getElementById('m-lokasi').innerText = "📍 " + gerbangAktif;
+            document.getElementById('m-icon-container').innerHTML = `
+                <img src="${pathFolder}${icon}" style="width: 130px; height: 130px; border-radius: 50%; object-fit: cover; border: 5px solid #27ae60;" onerror="this.src='https://placeholder.com'">
+            `;
+            document.getElementById('modalGuru').style.display = 'block';
+        }
+
+        function tutupModal() { document.getElementById('modalGuru').style.display = 'none'; }
+
+        window.onclick = (e) => { if (e.target.classList.contains('modal')) tutupModal(); }
+
+        window.onload = updateTampilan;
+    </script>
+
+    <footer>
+        &copy; 2026 <b>Kelompok [APEJE]</b> - SMK Negeri 3 Jember
+    </footer>
+</body>
+
+</html>
